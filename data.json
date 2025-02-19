@@ -1,0 +1,58 @@
+{
+    "users": [
+        {
+            "username": "olanordmann",
+            "name": "Ola Nordmann",
+            "account_number": "4",
+            "balance": 6000
+        },
+        {
+            "username": "karinordmann",
+            "name": "Kari Nordmann",
+            "account_number": "3",
+            "balance": 7500
+        },
+        {
+            "username": "aayan",
+            "name": "aayan aqdas",
+            "account_number": "2",
+            "balance": 0
+        },
+        {
+            "username": "hei",
+            "name": "heihei",
+            "account_number": "5",
+            "balance": 0
+        },
+        {
+            "username": "hei123",
+            "name": "heihei",
+            "account_number": "1",
+            "balance": 0
+        },
+        {
+            "username": "asdads",
+            "name": "wsasd",
+            "account_number": "58110773346",
+            "balance": 0
+        },
+        {
+            "username": "asd",
+            "name": "hei",
+            "account_number": "23418248974",
+            "balance": 0
+        },
+        {
+            "username": "heip\u00e5deg",
+            "name": "aayan",
+            "account_number": "94793727195",
+            "balance": 0
+        },
+        {
+            "username": "halllo",
+            "name": "hva skjer",
+            "account_number": "31664255942",
+            "balance": 0
+        }
+    ]
+}
