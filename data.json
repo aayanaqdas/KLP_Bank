@@ -1,38 +1,39 @@
 {
     "users": {
         "olanordmann": {
+            "username": "olanordmann",
             "name": "Ola Nordmann",
             "account_number": "44444444444",
             "balance": 6000
         },
         "karinordmann": {
+            "username": "karinordmann",
             "name": "Kari Nordmann",
             "account_number": "33333333333",
             "balance": 7500
         },
         "aayan": {
+            "username": "aayan",
             "name": "aayan aqdas",
-            "account_number": "23060006777",
-            "balance": 0
-        },
-        "hei": {
-            "name": "hei",
-            "account_number": "66186865248",
-            "balance": 0
-        },
-        "asdasd": {
-            "name": "adasda",
-            "account_number": "98224027314",
-            "balance": 0
-        },
-        "sdfsdfsdf": {
-            "name": "sdfsfsdfsdf",
-            "account_number": "28875416334",
+            "account_number": "88626487997",
             "balance": 0
         },
         "heihei": {
-            "name": "aayanaqdas",
-            "account_number": "27813518444",
+            "username": "heihei",
+            "name": "heihei",
+            "account_number": "18503858107",
+            "balance": 1000
+        },
+        "hallo": {
+            "username": "hallo",
+            "name": "hallo",
+            "account_number": "53246237476",
+            "balance": 1000
+        },
+        "aa": {
+            "username": "aa",
+            "name": "aayan",
+            "account_number": "55969178528",
             "balance": 0
         }
     }
