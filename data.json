@@ -1,58 +1,39 @@
 {
-    "users": [
-        {
-            "username": "olanordmann",
+    "users": {
+        "olanordmann": {
             "name": "Ola Nordmann",
-            "account_number": "4",
+            "account_number": "44444444444",
             "balance": 6000
         },
-        {
-            "username": "karinordmann",
+        "karinordmann": {
             "name": "Kari Nordmann",
-            "account_number": "3",
+            "account_number": "33333333333",
             "balance": 7500
         },
-        {
-            "username": "aayan",
+        "aayan": {
             "name": "aayan aqdas",
-            "account_number": "2",
+            "account_number": "23060006777",
             "balance": 0
         },
-        {
-            "username": "hei",
-            "name": "heihei",
-            "account_number": "5",
-            "balance": 0
-        },
-        {
-            "username": "hei123",
-            "name": "heihei",
-            "account_number": "1",
-            "balance": 0
-        },
-        {
-            "username": "asdads",
-            "name": "wsasd",
-            "account_number": "58110773346",
-            "balance": 0
-        },
-        {
-            "username": "asd",
+        "hei": {
             "name": "hei",
-            "account_number": "23418248974",
+            "account_number": "66186865248",
             "balance": 0
         },
-        {
-            "username": "heip\u00e5deg",
-            "name": "aayan",
-            "account_number": "94793727195",
+        "asdasd": {
+            "name": "adasda",
+            "account_number": "98224027314",
             "balance": 0
         },
-        {
-            "username": "halllo",
-            "name": "hva skjer",
-            "account_number": "31664255942",
+        "sdfsdfsdf": {
+            "name": "sdfsfsdfsdf",
+            "account_number": "28875416334",
+            "balance": 0
+        },
+        "heihei": {
+            "name": "aayanaqdas",
+            "account_number": "27813518444",
             "balance": 0
         }
-    ]
+    }
 }

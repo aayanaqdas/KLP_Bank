@@ -2,17 +2,28 @@ import json
 import os
 import random
 
-BANK_DATA = "data.json"
+RED = "\033[91m"     
+GREEN = "\033[92m"   
+YELLOW = "\033[93m"  
+BLUE = "\033[94m"  
+RESET = "\033[0m"    # Tilbakestill farge
+
+
+DATA_FILE = "data.json"
 
 def load_bank_data():
-    if os.path.exists(BANK_DATA):
-        with open(BANK_DATA, "r") as file:
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as file:
             return json.load(file)
     return {}
 
+def save_data(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+
 
 def print_start_menu():
-    print("------------------ KLP Bank ------------------")
+    print("\n------------------ KLP Bank ------------------")
     print("| 1. Logg inn                                |")
     print("| 2. Opprett ny bruker                       |")
     print("----------------------------------------------")
@@ -20,80 +31,90 @@ def print_start_menu():
     menu_choice = input("Skriv inn tall for å velge fra menyen: ")
     execute_start_menu_choice(menu_choice)
 
-def print_main_menu():
-    print("------------------ KLP Bank ------------------")
-    print("| 1. Se saldo                                |")
-    print("| 2. Sett inn penger                         |")
-    print("| 3. Ta ut penger                            |")
-    print("| 4. Logg ut                                 |")
-    print("----------------------------------------------")
-
 def execute_start_menu_choice(choice):
     if choice == "1":
         login()
     elif choice == "2":
         create_user()
     else:
-        print("Ugyldig valg! Vennligst velg et tall fra menyen")
+        print( RED + "Ugyldig valg! Vennligst velg et tall fra menyen" + RESET)
         print_start_menu()
+
+def print_main_menu(user):
+    print("\n------------------ KLP Bank ------------------")
+    print( BLUE + f" Velkommen {user["name"]}     " + RESET)
+    print("| 1. Se saldo                                |")
+    print("| 2. Sett inn penger                         |")
+    print("| 3. Ta ut penger                            |")
+    print("| 4. Logg ut                                 |")
+    print("----------------------------------------------")
+
+    menu_choice = input("Skriv inn tall for å velge fra menyen: ")
+    execute_main_menu_choice(menu_choice, user)
+
+def execute_main_menu_choice(choice, user):
+    if choice == "1":
+        print(f"Saldo: {user['balance']} kr")
+        print_main_menu(user)
+    elif choice == "2":
+        # transfer()
+        print("transfer")
+    else:
+        print( RED + "Ugyldig valg! Vennligst velg et tall fra menyen" + RESET)
+        print_main_menu(user)
+    
+
+def login():
+    bank_data = load_bank_data()
+    bank_users = bank_data["users"]
+
+    print( BLUE + "\n-------------------- Login --------------------" + RESET)
+    username = input("Tast inn ditt brukernavn for å logge inn: ")
+
+    if username in bank_users:
+        print_main_menu(bank_users[username]) # Sender inn brukerobjektet til print_main_menu for å få tilgang til brukerens detaljer
+    else:
+        print( RED + "Ugyldig brukernavn. Vennligst prøv igjen!" + RESET)
+        login()
+
 
 def create_user():
     bank_data = load_bank_data()
     bank_users = bank_data["users"]
 
-
-    name = input("Skriv inn fornavn og etternavnet ditt: ")
+    print( BLUE + "\n-------------------- Opprett Bruker --------------------" + RESET)
+    name = input("Skriv inn fulle navn: ")
     username = input("Skriv inn brukernavn: ").lower()
 
-    if any(user["username"] == username for user in bank_users):
-        print("Brukernavn er tatt! Vennligst velg en annen")
+    if username in bank_users:
+        print(RED + f"Brukernavnet '{YELLOW + username + RED}' er allerede tatt. Vennligst velg en annen" + RESET)
         create_user()
     else:
         account_number = generate_account_num(bank_users)
-        new_user_data = {
-            "username": username,
+        new_user = {
             "name": name,
             "account_number": account_number,
-            "balance": 0  # Initial balance set to 0
+            "balance": 0
         }
-        bank_users.append(new_user_data)
-        save_data(bank_data)
-        print(f"Bruker opprettet med kontonummer: {account_number}")
 
+        bank_users[username] = new_user
+        save_data(bank_data)
+        print(GREEN + f"\nBruker opprettet med brukernavn: {username} og kontonummer: {account_number}" + RESET)
+
+        print_main_menu(bank_users[username])
+
+    
 
 
 def generate_account_num(existing_users):
-    existing_account_numbers = {user["account_number"] for user in existing_users}
+    # Funksjonen passer på å ikke generere kontonummer som allerede eksisterer ved å loope gjennom alle brukernes kontonummer
+    existing_account_numbers = {user["account_number"] for user in existing_users.values()}
     
     while True:
-        account_number = str(random.randint(10000000000, 99999999999))  # 11-digit number
+        account_number = str(random.randint(10000000000, 99999999999))  # 11 siffer nummer
         if account_number not in existing_account_numbers:
             return account_number
 
-def login():
-    username = input("Tast inn ditt brukernavn: ")
-
     
 
-def save_data(data):
-    with open(BANK_DATA, "w") as file:
-        json.dump(data, file, indent=4)
-
 print_start_menu()
-
-    # if username in bank_users:
-    #     print("Brukernavn eksisterer allerede. Vennligst oppgi nytt brukernavn")
-    #     create_user()
-    # else:
-    #     account_number = generate_account_num()
-    #     print(account_number)
-
-    #     print(bank_users)
-    #     new_user_data = {
-    #         "name": name,
-    #         "account_number": account_number,
-    #         "balance": 0  # Initial balance set to 0
-    #     }
-    #     bank_users[username] = new_user_data
-    #     bank_users["users"] = bank_users
-    #     save_data(bank_data[username])
