@@ -10,13 +10,13 @@
             "username": "karinordmann",
             "name": "Kari Nordmann",
             "account_number": "33333333333",
-            "balance": 7500
+            "balance": 4623
         },
         "aayan": {
             "username": "aayan",
             "name": "aayan aqdas",
             "account_number": "88626487997",
-            "balance": 4000
+            "balance": 0
         },
         "heihei": {
             "username": "heihei",
@@ -35,6 +35,12 @@
             "name": "aayan",
             "account_number": "55969178528",
             "balance": 0
+        },
+        "heiheihei": {
+            "username": "heiheihei",
+            "name": "heip\u00e5deg",
+            "account_number": "24302751742",
+            "balance": 200000
         }
     }
 }
