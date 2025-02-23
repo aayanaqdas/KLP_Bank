@@ -7,6 +7,7 @@ RED = "\033[91m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
 BLUE = "\033[94m"
+CYAN = "\033[96m"
 RESET = "\033[0m"  # Tilbakestill farge
 
 # Filnavn for lagring av bankdata
@@ -24,12 +25,14 @@ def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4)
 
+current_user = None
+
 # Funksjon for å vise startmenyen
 def print_start_menu():
-    print("\n------------------ KLP Bank ------------------")
+    print(f"\n{BLUE}------------------ KLP Bank ------------------")
     print("| 1. Logg inn                                |")
     print("| 2. Opprett ny bruker                       |")
-    print("----------------------------------------------")
+    print(f"----------------------------------------------{RESET}")
 
     menu_choice = input("Skriv inn tall for å velge fra menyen: ")
     execute_start_menu_choice(menu_choice)
@@ -47,11 +50,11 @@ def execute_start_menu_choice(choice):
 # Funksjon for å vise hovedmenyen
 def print_main_menu(user_obj):
     print("\n------------------ KLP Bank ------------------")
-    print(f"{BLUE} Velkommen {user_obj['name']} {RESET}")
-    print("| 1. Se saldo                                |")
-    print("| 2. Sett inn penger                         |")
-    print("| 3. Ta ut penger                            |")
-    print("| 4. Logg ut                                 |")
+    print(f"{YELLOW}Velkommen {user_obj['name']} {RESET}")
+    print("\n 1. Se saldo                                ")
+    print(" 2. Sett inn penger                         ")
+    print(" 3. Ta ut penger                            ")
+    print(" 4. Logg ut                                 ")
     print("----------------------------------------------")
 
     menu_choice = input("Skriv inn tall for å velge fra menyen: ")
@@ -60,7 +63,7 @@ def print_main_menu(user_obj):
 # Funksjon for å håndtere valg i hovedmenyen
 def execute_main_menu_choice(choice, user_obj):
     if choice == "1":
-        check_balance(user_obj)
+        display_balance(user_obj, 0, "display")
     elif choice == "2":
         deposit(user_obj)
     elif choice == "3":
@@ -124,20 +127,22 @@ def generate_account_num(existing_users):
             return account_number
 
 # Funksjon for å sjekke saldo
-def check_balance(user_obj):
-    # user_obj er en gammel versjon av bruker infoen som blir satt når man logger inn
-    # Må derfor hente inn data på nytt for oppdatert info
+def display_balance(user_obj, amount, action):
     current_user = user_obj["username"]
-
     bank_data = load_bank_data()
     bank_users = bank_data["users"]
-
     balance = bank_users[current_user]["balance"]
 
     print( BLUE + "\n-------------------- Saldo --------------------" + RESET)
-    print(f"{GREEN}Saldo: {balance} kr{RESET}")
+    if action == "deposit":
+        print(f"{GREEN}+{amount}{RESET}")
+    elif action == "withdraw":
+        print(f"{RED}-{amount}{RESET}")
+
+    print(f"{YELLOW}Saldo: {balance} kr{RESET}")
     input("Trykk enter for å gå tilbake ")
     print_main_menu(user_obj)
+
 
 # Funksjon for å sette inn penger
 def deposit(user_obj):
@@ -152,13 +157,29 @@ def deposit(user_obj):
     print(f"{YELLOW}{user_obj['name']}")
     print(f"Saldo: {current_balance} kr")
     print(f"Kontonummer: {user_obj['account_number']}{RESET}")
+    print("\n1. Sett inn penger")
+    print("2. Gå tilbake")
+    print(f"{BLUE}-------------------------------------------------{RESET}")
 
-    amount = int(input("\nBeløp du vil sette inn: "))
+    choice = input("Tast inn ditt valg:  ")
 
-    new_balance = bank_users[current_user]["balance"] + amount
-    bank_users[current_user]["balance"] = new_balance
-    save_data(bank_data)
-    check_balance(user_obj)
+    if choice == "1":
+        amount = int(input("\nBeløp du vil sette inn: "))
+
+        if amount < 0:
+            input(RED + "Ugyldig beløp! Trykk enter for å prøve igjen " + RESET)
+            deposit(user_obj)
+        else:
+            new_balance = bank_users[current_user]["balance"] + amount
+            bank_users[current_user]["balance"] = new_balance
+            save_data(bank_data)
+
+            display_balance(user_obj, amount, "deposit")
+    elif choice == "2":
+        print_main_menu(user_obj)
+    else:
+        print(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen{RESET}")
+        deposit(user_obj)
 
 # Funksjon for å ta ut penger
 def withdraw(user_obj):
@@ -173,17 +194,30 @@ def withdraw(user_obj):
     print(f"{YELLOW}{user_obj['name']}")
     print(f"Saldo: {current_balance} kr")
     print(f"Kontonummer: {user_obj['account_number']}{RESET}")
+    print("\n1. Ta ut penger")
+    print("2. Gå tilbake")
+    print(f"{BLUE}-----------------------------------------------{RESET}")
 
-    amount = int(input("\nBeløp du vil ta ut: "))
+    choice = input("Tast inn ditt valg:  ")
 
-    if amount > current_balance:
-        print(f"{RED}Ugyldig beløp! Du har ikke nok penger på kontoen.{RESET}")
-        withdraw(user_obj)
+    if choice == "1":
+        amount = int(input("\nBeløp du vil ta ut: "))
+
+        if amount > current_balance:
+            input(RED + "Ugyldig beløp! Du har ikke nok penger på kontoen. Trykk enter for å prøve igjen " + RESET)
+            withdraw(user_obj)
+        else:
+            new_balance = bank_users[current_user]["balance"] - amount
+            bank_users[current_user]["balance"] = new_balance
+            save_data(bank_data)
+
+            display_balance(user_obj, amount, "withdraw")
+    elif choice == "2":
+        print_main_menu(user_obj)
     else:
-        new_balance = bank_users[current_user]["balance"] - amount
-        bank_users[current_user]["balance"] = new_balance
-        save_data(bank_data)
-        check_balance(user_obj)
+        print(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen{RESET}")
+        withdraw(user_obj)
+
 
 # Start programmet
 print_start_menu()
