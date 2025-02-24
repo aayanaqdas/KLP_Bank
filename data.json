@@ -5,26 +5,26 @@
             "name": "aayan",
             "accounts": {
                 "brukskonto": {
-                    "account_number": "47538011482",
-                    "balance": 1900
+                    "account_number": "34309424993",
+                    "balance": 0
                 },
                 "sparekonto": {
-                    "account_number": "23214793465",
+                    "account_number": "24561751458",
                     "balance": 0
                 }
             }
         },
-        "hei": {
-            "username": "hei",
+        "hjei": {
+            "username": "hjei",
             "name": "hei",
             "accounts": {
                 "brukskonto": {
-                    "account_number": "32476941347",
-                    "balance": 2000
+                    "account_number": "71003281240",
+                    "balance": 10000
                 },
                 "sparekonto": {
-                    "account_number": "73096068498",
-                    "balance": 2000
+                    "account_number": "52791397996",
+                    "balance": 0
                 }
             }
         }
