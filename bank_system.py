@@ -63,11 +63,13 @@ def print_main_menu():
 # Funksjon for å håndtere valg i hovedmenyen
 def execute_main_menu_choice(choice):
     if choice == "1":
-        display_balance(0, "display")
+        display_balance( "all", 0, "display")
     elif choice == "2":
-        deposit()
+        account_type = select_account_type()
+        deposit(account_type)
     elif choice == "3":
-        withdraw()
+        account_type = select_account_type()
+        withdraw(account_type)
     elif choice == "4":
         global current_user
         current_user = None # Reset bruker
@@ -84,9 +86,11 @@ def login():
     bank_users = bank_data["users"]  # Henter inn alle brukerne i JSON-filen
 
     print(f"{BLUE_ITALIC}\n-------------------- Login --------------------{RESET}")
-    username = input("Tast inn ditt brukernavn for å logge inn: ")
+    username = input("Tast inn ditt brukernavn for å logge inn eller tast 1 for å gå tilbake: ")
 
-    if username in bank_users:
+    if username == "1":
+        print_start_menu()
+    elif username in bank_users:
         current_user = bank_users[username]
         print_main_menu()
     else:
@@ -108,61 +112,79 @@ def create_user():
         print(f"{RED}Brukernavnet {BLUE_ITALIC}'{username}'{RED} er allerede tatt. Vennligst velg en annen{RESET}")
         create_user()
     else:
-        account_number = generate_account_num(bank_users)
         new_user = {
             "username": username,
             "name": name,
-            "account_number": account_number,
-            "balance": 0
+            "accounts": {
+                "brukskonto": {
+                    "account_number": generate_account_num(bank_users),
+                    "balance": 0
+                },
+                "sparekonto": {
+                    "account_number": generate_account_num(bank_users),
+                    "balance": 0
+                }
+            }
         }
 
         bank_users[username] = new_user
         save_data(bank_data)
-        print(f"{GREEN}\nBruker opprettet med brukernavn: {username} og kontonummer: {account_number}{RESET}")
-
         current_user = bank_users[username]
+
+        print(f"{GREEN}\nBruker opprettet med brukernavn: {username}{RESET}")
+
         print_main_menu()
 
 # Funksjon for å generere et unikt kontonummer
 def generate_account_num(existing_users):
-    # Funksjonen passer på å ikke generere kontonummer som allerede eksisterer ved å loope gjennom alle brukernes kontonummer
-    existing_account_numbers = {user["account_number"] for user in existing_users.values()}
+    existing_account_numbers = set()
+    for user in existing_users.values():
+        for account in user["accounts"].values():
+            existing_account_numbers.add(account["account_number"])
     
     while True:
         account_number = str(random.randint(10000000000, 99999999999))  # 11 siffer nummer
         if account_number not in existing_account_numbers:
             return account_number
 
+
 # Funksjon for å sjekke saldo
-def display_balance(amount, action):
+def display_balance(account_type, amount, action):
     bank_data = load_bank_data()
     bank_users = bank_data["users"]
 
-    balance = bank_users[current_user["username"]]["balance"]
+    user_accounts = bank_users[current_user["username"]]["accounts"]
 
     print( BLUE_ITALIC + "\n-------------------- Saldo --------------------" + RESET)
     if action == "deposit":
+        # Viser saldo kun til den kontoen du satte inn penger
         print(f"{GREEN}+{amount}{RESET}")
+        print(f"{YELLOW}{account_type}: {bank_users[current_user["username"]]["accounts"][account_type]["balance"]} kr{RESET}")
     elif action == "withdraw":
+        # Viser saldo kun til den kontoen du tok ut penger fra
         print(f"{RED}-{amount}{RESET}")
+        print(f"{YELLOW}{account_type}: {bank_users[current_user["username"]]["accounts"][account_type]["balance"]} kr{RESET}")
+    else:
+        # Viser saldo på alle kontoene
+        for account_type, account_info in user_accounts.items():
+            print(f"{YELLOW}{account_type}: {account_info['balance']} kr{RESET}")
 
-    print(f"{YELLOW}Saldo: {balance} kr{RESET}")
     input("Trykk enter for å gå tilbake ")
     print_main_menu()
 
 
 # Funksjon for å sette inn penger
-def deposit():
+def deposit(account_type):
     # Henter inn oppdatert bruker info
     bank_data = load_bank_data()
     bank_users = bank_data["users"]
 
-    current_balance = bank_users[current_user["username"]]["balance"]
+    current_balance = bank_users[current_user["username"]]["accounts"][account_type]["balance"]
 
     print(f"{BLUE_ITALIC}\n-------------------- Sett inn --------------------{RESET}")
     print(f"{YELLOW}{current_user["name"]}")
     print(f"Saldo: {current_balance} kr")
-    print(f"Kontonummer: {current_user['account_number']}{RESET}")
+    print(f"Kontonummer: {current_user['accounts'][account_type]["account_number"]}{RESET}")
     print("\n1. Sett inn penger")
     print("2. Gå tilbake")
     print(f"{BLUE_ITALIC}-------------------------------------------------{RESET}")
@@ -172,36 +194,38 @@ def deposit():
     if choice == "1":
         amount = int(input("\nBeløp du vil sette inn: "))
 
-        if amount < 0:
+        if amount <= 0:
             input(RED + "Ugyldig beløp! Trykk enter for å prøve igjen " + RESET)
-            deposit()
+            deposit(account_type)
         else:
-            new_balance = bank_users[current_user["username"]]["balance"] + amount
-            bank_users[current_user["username"]]["balance"] = new_balance
+            new_balance = current_balance + amount
+
+            # Lagrer den nye saldoen til bruker i valgt konto
+            bank_users[current_user["username"]]["accounts"][account_type]["balance"] = new_balance
             save_data(bank_data)
 
-            display_balance(amount, "deposit")
+            display_balance( account_type, amount, "deposit")
     elif choice == "2":
         print_main_menu()
     else:
         input(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen. Trykk Enter for å prøve igjen{RESET}")
-        deposit()
+        deposit(account_type)
 
 # Funksjon for å ta ut penger
-def withdraw():
+def withdraw(account_type):
     # Henter inn oppdatert bruker info
     bank_data = load_bank_data()
     bank_users = bank_data["users"]
 
-    current_balance = bank_users[current_user["username"]]["balance"]
+    current_balance = bank_users[current_user["username"]]["accounts"][account_type]["balance"]
 
     print(f"{BLUE_ITALIC}\n-------------------- Ta ut --------------------{RESET}")
-    print(f"{YELLOW}{current_user['name']}")
+    print(f"{YELLOW}{current_user["name"]}")
     print(f"Saldo: {current_balance} kr")
-    print(f"Kontonummer: {current_user['account_number']}{RESET}")
+    print(f"Kontonummer: {current_user['accounts'][account_type]["account_number"]}{RESET}")
     print("\n1. Ta ut penger")
     print("2. Gå tilbake")
-    print(f"{BLUE_ITALIC}-----------------------------------------------{RESET}")
+    print(f"{BLUE_ITALIC}-------------------------------------------------{RESET}")
 
     choice = input("Tast inn ditt valg:  ")
 
@@ -209,19 +233,40 @@ def withdraw():
         amount = int(input("\nBeløp du vil ta ut: "))
 
         if amount > current_balance:
-            input(RED + "Ugyldig beløp! Du har ikke nok penger på kontoen. Trykk enter for å prøve igjen " + RESET)
-            withdraw()
+            input(RED + "Du har ikke nok penger på konto! Trykk enter for å prøve igjen " + RESET)
+            withdraw(account_type)
         else:
-            new_balance = bank_users[current_user["username"]]["balance"] - amount
-            bank_users[current_user["username"]]["balance"] = new_balance
+            new_balance = current_balance - amount
+
+            # Lagrer den nye saldoen til bruker i valgt konto
+            bank_users[current_user["username"]]["accounts"][account_type]["balance"] = new_balance
             save_data(bank_data)
 
-            display_balance(amount, "withdraw")
+            display_balance( account_type, amount, "withdraw")
     elif choice == "2":
         print_main_menu()
     else:
-        print(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen{RESET}")
-        withdraw()
+        input(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen. Trykk Enter for å prøve igjen{RESET}")
+        withdraw(account_type)
+
+# Funksjon for å velge kontotype
+def select_account_type():
+    print(f"\n{BLUE_ITALIC}------------------ Velg Konto ------------------{RESET}")
+    print(" 1. Brukskonto")
+    print(" 2. Sparekonto")
+    print(f"{BLUE_ITALIC}---------------------------------------------------{RESET}")
+
+    choice = input("Skriv inn tall for å velge konto: ")
+
+    if choice == "1":
+        return "brukskonto"
+    elif choice == "2":
+        return "sparekonto"
+    else:
+        input(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen (1-2). Trykk Enter for å prøve igjen{RESET}")
+        return select_account_type()
+
+    
 
 
 # Start programmet

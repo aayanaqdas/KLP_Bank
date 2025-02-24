@@ -1,46 +1,32 @@
 {
     "users": {
-        "olanordmann": {
-            "username": "olanordmann",
-            "name": "Ola Nordmann",
-            "account_number": "44444444444",
-            "balance": 6000
-        },
-        "karinordmann": {
-            "username": "karinordmann",
-            "name": "Kari Nordmann",
-            "account_number": "33333333333",
-            "balance": 4623
-        },
         "aayan": {
             "username": "aayan",
-            "name": "aayan aqdas",
-            "account_number": "88626487997",
-            "balance": 1000
-        },
-        "heihei": {
-            "username": "heihei",
-            "name": "heihei",
-            "account_number": "18503858107",
-            "balance": 1000
-        },
-        "hallo": {
-            "username": "hallo",
-            "name": "hallo",
-            "account_number": "53246237476",
-            "balance": 1000
-        },
-        "aa": {
-            "username": "aa",
             "name": "aayan",
-            "account_number": "55969178528",
-            "balance": 11000
+            "accounts": {
+                "brukskonto": {
+                    "account_number": "47538011482",
+                    "balance": 1900
+                },
+                "sparekonto": {
+                    "account_number": "23214793465",
+                    "balance": 0
+                }
+            }
         },
-        "heiheihei": {
-            "username": "heiheihei",
-            "name": "heip\u00e5deg",
-            "account_number": "24302751742",
-            "balance": 200000
+        "hei": {
+            "username": "hei",
+            "name": "hei",
+            "accounts": {
+                "brukskonto": {
+                    "account_number": "32476941347",
+                    "balance": 2000
+                },
+                "sparekonto": {
+                    "account_number": "73096068498",
+                    "balance": 2000
+                }
+            }
         }
     }
 }
