@@ -105,10 +105,10 @@ def execute_main_menu_choice(choice):
     if choice == "1":
         display_balance("all", 0, "display")  # Viser saldo. Parametere: kontotype, beløp, handling
     elif choice == "2":
-        account_type = select_account_type()  # Velger kontotype
+        account_type = select_account_type("")  # Velger kontotype
         deposit(account_type)  # Sender inn konto type brukskonto/sparekonto
     elif choice == "3":
-        account_type = select_account_type()  # Velger kontotype brukskonto/sparekonto
+        account_type = select_account_type("")  # Velger kontotype brukskonto/sparekonto
         withdraw(account_type)  # Sender inn konto type brukskonto/sparekonto
     elif choice == "4":
         transfer()
@@ -152,9 +152,13 @@ def create_user():
     bank_users = bank_data["users"]  # Henter ut brukerne fra dataen
 
     print(f"{BLUE_ITALIC}\n-------------------- Opprett Bruker --------------------{RESET}")
-    name = input("Skriv inn fulle navn: ")
-    username = input("Skriv inn brukernavn: ").lower()
+    name = input("Skriv inn fulle navn eller trykk 1 for å gå tilbake: ")
+    if name == "1": print_start_menu()
 
+    username = input("Skriv inn brukernavn eller trykk 1 for å gå tilbake: ").lower()
+    if username == "1": print_start_menu()
+
+    
     if username in bank_users:
         # Gir beskjed om at brukernavnet er tatt og prøver på nytt
         print(f"{RED}Brukernavnet {BLUE_ITALIC}'{username}'{RED} er allerede tatt. Vennligst velg en annen{RESET}")
@@ -335,70 +339,112 @@ def transfer():
     print(f"{YELLOW}{current_user['name']}{RESET}")
     for account_type, account_info in user_accounts.items():
         print(f"{YELLOW}{account_type}: {account_info['balance']} kr{RESET}")
-
-    print(" 1. Brukskonto")
-    print(" 2. Sparekonto")
-
-    # Velger kontoen å overføre fra
-    # from_account = select_account_type()
     
-    choice = input("Velg konto du vil overføre fra: ")
+    print("1. Overføre til andre")
+    print("2. Overføre mellom egne kontoer")
+    print("3. Gå tilbake")
+
+    choice = input("Velg fra menyen: ")
+
     if choice == "1":
-        from_account = "brukskonto"
+        # Overføre til andre
+        recipient_account_number = input("Skriv inn mottakerens kontonummer: ")
+        recipient_account = None
+        recipient_user = None
+
+        # Finn mottakerens konto
+        for user, user_data in bank_users.items():
+            for account_type, account_info in user_data["accounts"].items():
+                if account_info["account_number"] == recipient_account_number:
+                    recipient_account = account_info
+                    break
+            if recipient_account:
+                break
+
+        if not recipient_account:
+            input(f"{RED}Ugyldig kontonummer! Trykk Enter for å prøve igjen.{RESET}")
+            transfer()
+            return
+
+        from_account = select_account_type("transfer_from")
+        from_balance = bank_users[current_user["username"]]["accounts"][from_account]["balance"]
+
+        print(f"{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
+        amount = int(input(f"Beløp du vil overføre fra {from_account} til {recipient_account_number}: "))
+
+        if amount <= 0 or amount > from_balance:
+            input(f"{RED}Ugyldig beløp! Trykk Enter for å prøve igjen.{RESET}")
+            transfer()
+            return
+
+        # Oppdaterer saldoene
+        bank_users[current_user["username"]]["accounts"][from_account]["balance"] -= amount
+        recipient_account["balance"] += amount
+
+        save_data(bank_data)  # Lagrer dataen til fil
+
+        print(f"{GREEN}Overføring vellykket!{RESET}")
+        display_balance("all", 0, "display")  # Viser saldoen etter overføringen
+
     elif choice == "2":
-        from_account = "sparekonto"
+        # Overføre mellom egne kontoer
+        from_account = select_account_type("transfer_from")
+        from_balance = bank_users[current_user["username"]]["accounts"][from_account]["balance"]
 
-    from_balance = bank_users[current_user["username"]]["accounts"][from_account]["balance"]
+        to_account = select_account_type("transfer_to")
 
-    # Velger kontoen å overføre til
-    choice = input("Velg konto du skal overføre til: ")
-    if choice == "1":
-        to_account = "brukskonto"
-    elif choice == "2":
-        to_account = "sparekonto"
+        if from_account == to_account:
+            input(f"{RED}Du kan ikke overføre penger til samme konto. Trykk Enter for å prøve igjen.{RESET}")
+            transfer()
+            return
 
+        print(f"{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
+        amount = int(input(f"Beløp du vil overføre fra {from_account} til {to_account}: "))
 
-    if from_account == to_account:
-        input(f"{RED}Du kan ikke overføre penger til samme konto. Trykk Enter for å prøve igjen.{RESET}")
+        if amount <= 0 or amount > from_balance:
+            input(f"{RED}Ugyldig beløp! Trykk Enter for å prøve igjen.{RESET}")
+            transfer()
+            return
+
+        # Oppdaterer saldoene
+        bank_users[current_user["username"]]["accounts"][from_account]["balance"] -= amount
+        bank_users[current_user["username"]]["accounts"][to_account]["balance"] += amount
+
+        save_data(bank_data)  # Lagrer dataen til fil
+
+        print(f"{GREEN}Overføring vellykket!{RESET}")
+        display_balance("all", 0, "display")  # Viser saldoen etter overføringen
+
+    elif choice == "3":
+        print_main_menu()
+    else:
+        input(f"{RED}Ugyldig valg! Trykk Enter for å prøve igjen.{RESET}")
         transfer()
-        return
-
-    print(f"{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
-    amount = int(input(f"Beløp du vil overføre fra {from_account} til {to_account}: "))
-
-    if amount <= 0 or amount > from_balance:
-        input(f"{RED}Ugyldig beløp! Trykk Enter for å prøve igjen.{RESET}")
-        transfer()
-        return
-
-    # Oppdaterer saldoene
-    bank_users[current_user["username"]]["accounts"][from_account]["balance"] -= amount
-    bank_users[current_user["username"]]["accounts"][to_account]["balance"] += amount
-
-    save_data(bank_data)  # Lagrer dataen til fil
-
-    print(f"{GREEN}Overføring vellykket!{RESET}")
-    display_balance("all", 0, "display")  # Viser saldoen etter overføringen
 
 
 
 
 
 # Funksjon for å velge kontotype
-def select_account_type():
+def select_account_type(action):
     """
     Viser en meny for å velge kontotype og returnerer brukerens valg.
+    Parametere :
+        action (str): type handling man skal gjøre. Betemmer hva som står på inputen
     Returnerer:
         str: Valgt kontotype (brukskonto eller sparekonto).
     """
-
-
     print(f"\n{BLUE_ITALIC}------------------ Velg Konto ------------------{RESET}")
     print(" 1. Brukskonto")
     print(" 2. Sparekonto")
-    print(f"{BLUE_ITALIC}---------------------------------------------------{RESET}")
+    print(f"{BLUE_ITALIC}------------------------------------------------{RESET}")
 
-    choice = input("Skriv inn tall for å velge konto: ")
+    if action == "transfer_from":
+        choice = input("Velg konto du vil overføre fra: ")
+    elif action == "transfer_to":
+        choice = input("Velg konto du vil overføre til: ")
+    else:
+        choice = input("Skriv inn tall for å velge konto: ")
 
     if choice == "1":
         return "brukskonto"
@@ -406,7 +452,7 @@ def select_account_type():
         return "sparekonto"
     else:
         input(f"{RED}Ugyldig valg! Vennligst velg et tall fra menyen (1-2). Trykk Enter for å prøve igjen{RESET}")
-        return select_account_type()
+        return select_account_type(action)
 
 
 # Start programmet ved å vise startmenyen

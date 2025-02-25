@@ -6,11 +6,11 @@
             "accounts": {
                 "brukskonto": {
                     "account_number": "34309424993",
-                    "balance": 80000
+                    "balance": 69100
                 },
                 "sparekonto": {
                     "account_number": "24561751458",
-                    "balance": 11100
+                    "balance": 24000
                 }
             }
         },
@@ -20,7 +20,7 @@
             "accounts": {
                 "brukskonto": {
                     "account_number": "71003281240",
-                    "balance": 10000
+                    "balance": 19000
                 },
                 "sparekonto": {
                     "account_number": "52791397996",
@@ -38,6 +38,34 @@
                 },
                 "sparekonto": {
                     "account_number": "88342960695",
+                    "balance": 0
+                }
+            }
+        },
+        "as": {
+            "username": "as",
+            "name": "qdasas",
+            "accounts": {
+                "brukskonto": {
+                    "account_number": "39431907318",
+                    "balance": 0
+                },
+                "sparekonto": {
+                    "account_number": "88929862058",
+                    "balance": 0
+                }
+            }
+        },
+        "helo": {
+            "username": "helo",
+            "name": "helo",
+            "accounts": {
+                "brukskonto": {
+                    "account_number": "37853803449",
+                    "balance": 0
+                },
+                "sparekonto": {
+                    "account_number": "31218332509",
                     "balance": 0
                 }
             }
