@@ -1,6 +1,6 @@
-import json  # For lagring av data i JSON-format
-import os  # For å lese og skrive til filer
-import random  # For å generere tilfeldige tall for kontonummer
+import json
+import os
+import random
 
 # Fargekoder for terminalutskrift
 RED = "\033[91m"
@@ -103,12 +103,12 @@ def execute_main_menu_choice(choice):
     """
 
     if choice == "1":
-        display_balance("all", 0, "display")  # Viser saldo. Parametere: kontotype, beløp, handling
+        display_balance()
     elif choice == "2":
-        account_type = select_account_type("")  # Velger kontotype
+        account_type = select_account_type()  # Velger kontotype
         deposit(account_type)  # Sender inn konto type brukskonto/sparekonto
     elif choice == "3":
-        account_type = select_account_type("")  # Velger kontotype brukskonto/sparekonto
+        account_type = select_account_type()
         withdraw(account_type)  # Sender inn konto type brukskonto/sparekonto
     elif choice == "4":
         transfer()
@@ -216,7 +216,7 @@ def generate_account_num(existing_users):
 
 
 # Funksjon for å sjekke saldo
-def display_balance(account_type, amount, action):
+def display_balance(account_type="all", amount=0, action="display"):
     """
     Viser saldoen til brukeren.
     Parametere:
@@ -282,8 +282,8 @@ def handle_transaction(account_type, transaction_type):
     """
 
 
-    bank_data = load_bank_data()  # Laster inn bankdata fra fil
-    bank_users = bank_data["users"]  # Henter ut brukerne fra dataen
+    bank_data = load_bank_data()
+    bank_users = bank_data["users"]
 
     current_balance = bank_users[current_user["username"]]["accounts"][account_type]["balance"]  # Henter saldoen til kontoen
 
@@ -315,9 +315,9 @@ def handle_transaction(account_type, transaction_type):
                 new_balance = current_balance - amount
 
         bank_users[current_user["username"]]["accounts"][account_type]["balance"] = new_balance  # Oppdaterer saldoen
-        save_data(bank_data)  # Lagrer dataen til fil
+        save_data(bank_data)
 
-        display_balance(account_type, amount, transaction_type)  # Viser saldoen etter transaksjonen
+        display_balance(account_type, amount, transaction_type)
     elif choice == "2":
         print_main_menu()
     else:
@@ -330,8 +330,8 @@ def transfer():
     """
     Overfører penger mellom kontoer.
     """
-    bank_data = load_bank_data()  # Laster inn bankdata fra fil
-    bank_users = bank_data["users"]  # Henter ut brukerne fra dataen
+    bank_data = load_bank_data() 
+    bank_users = bank_data["users"] 
 
     user_accounts = bank_users[current_user["username"]]["accounts"]
 
@@ -340,23 +340,24 @@ def transfer():
     for account_type, account_info in user_accounts.items():
         print(f"{YELLOW}{account_type}: {account_info['balance']} kr{RESET}")
     
-    print("1. Overføre til andre")
+    print("\n1. Overføre til andre")
     print("2. Overføre mellom egne kontoer")
     print("3. Gå tilbake")
 
-    choice = input("Velg fra menyen: ")
+    choice = input("\nVelg fra menyen: ")
 
     if choice == "1":
         # Overføre til andre
         recipient_account_number = input("Skriv inn mottakerens kontonummer: ")
         recipient_account = None
-        recipient_user = None
+        recipient_name = None
 
         # Finn mottakerens konto
         for user, user_data in bank_users.items():
             for account_type, account_info in user_data["accounts"].items():
                 if account_info["account_number"] == recipient_account_number:
                     recipient_account = account_info
+                    recipient_name = user
                     break
             if recipient_account:
                 break
@@ -369,8 +370,9 @@ def transfer():
         from_account = select_account_type("transfer_from")
         from_balance = bank_users[current_user["username"]]["accounts"][from_account]["balance"]
 
-        print(f"{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
-        amount = int(input(f"Beløp du vil overføre fra {from_account} til {recipient_account_number}: "))
+        print(f"\n{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
+        print(f"Overfører til '{BLUE_ITALIC + recipient_name + RESET}' med kontonummer {recipient_account_number}")
+        amount = int(input(f"\nBeløp du vil overføre fra {from_account} til {recipient_account_number}: "))
 
         if amount <= 0 or amount > from_balance:
             input(f"{RED}Ugyldig beløp! Trykk Enter for å prøve igjen.{RESET}")
@@ -384,7 +386,7 @@ def transfer():
         save_data(bank_data)  # Lagrer dataen til fil
 
         print(f"{GREEN}Overføring vellykket!{RESET}")
-        display_balance("all", 0, "display")  # Viser saldoen etter overføringen
+        display_balance() 
 
     elif choice == "2":
         # Overføre mellom egne kontoer
@@ -398,7 +400,7 @@ def transfer():
             transfer()
             return
 
-        print(f"{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
+        print(f"\n{YELLOW}Saldo på {from_account}: {from_balance} kr{RESET}")
         amount = int(input(f"Beløp du vil overføre fra {from_account} til {to_account}: "))
 
         if amount <= 0 or amount > from_balance:
@@ -410,10 +412,10 @@ def transfer():
         bank_users[current_user["username"]]["accounts"][from_account]["balance"] -= amount
         bank_users[current_user["username"]]["accounts"][to_account]["balance"] += amount
 
-        save_data(bank_data)  # Lagrer dataen til fil
+        save_data(bank_data)
 
         print(f"{GREEN}Overføring vellykket!{RESET}")
-        display_balance("all", 0, "display")  # Viser saldoen etter overføringen
+        display_balance()
 
     elif choice == "3":
         print_main_menu()
@@ -426,7 +428,7 @@ def transfer():
 
 
 # Funksjon for å velge kontotype
-def select_account_type(action):
+def select_account_type(action=None):
     """
     Viser en meny for å velge kontotype og returnerer brukerens valg.
     Parametere :
