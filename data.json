@@ -6,11 +6,11 @@
             "accounts": {
                 "brukskonto": {
                     "account_number": "34309424993",
-                    "balance": 0
+                    "balance": 80000
                 },
                 "sparekonto": {
                     "account_number": "24561751458",
-                    "balance": 0
+                    "balance": 11100
                 }
             }
         },
@@ -24,6 +24,20 @@
                 },
                 "sparekonto": {
                     "account_number": "52791397996",
+                    "balance": 0
+                }
+            }
+        },
+        "www": {
+            "username": "www",
+            "name": "www",
+            "accounts": {
+                "brukskonto": {
+                    "account_number": "29277825039",
+                    "balance": 1000
+                },
+                "sparekonto": {
+                    "account_number": "88342960695",
                     "balance": 0
                 }
             }
